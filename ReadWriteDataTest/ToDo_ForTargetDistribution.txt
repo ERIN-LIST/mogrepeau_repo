@@ -1,0 +1,104 @@
+ToDo before update and test GPCAlgGlobalFSM on target system
+
+- See Problems encountered: #3
+- See Problems encountered: #4
+- See Problems encountered: #5 second proposition in ToDo
+
+Modified sinc last update
+- ReadWriteDataTest\GPCAlgGlobFSM.py
+- JobScheduler\JobManagement_GSc.py
+
+
+==== Done ====
+
+Update packages / modules (2012-07-10 Rev-259):
+- ReadWriteDataTest\GPCAlgGlobFSM.py, 
+- ReadWriteDataTest\GPCAlgGlobFSM_sm.py,
+
+Update packages / modules (2012-07-06):
+- ReadWriteDataTest\GPCAlgGlobFSM.py, 
+- ReadWriteDataTest\GPCAlgGlobFSM_sm.py,
+- ReadWriteDataTest\handleConfig.py
+
+Problems encountered:
+#5 in handleConfig.readConfigJob() an error occures in tobePending() method.
+   The problem is that cxt.S0_tUpdate my not exist yet at the moment the readConfigJob is done.
+-> This is new as it is possible now that the init process can take several iterations to be done.
+==> The direct access to S0_tUpdate Attribute of the context is a bad solution as this may not exist yet.
+ToDo:
+- Use try/except with a default sleep value.
+--> OK test works well.
+- A better solution would be to have a method that returns the S0_tUpdate from the cxt.
+  This would return something like None if S0_tUpdate is not set already.
+  In the None case a default sleep value could be used.
+
+#6 un-scheduling a job that is not scheduled any more raise an error in the scheduler.
+-> in GPCAlgGlobFSM.jobRTrig() the unschedule_job() method was used if the trigger was detected.
+   But if this was the last scheduled run (max_runs) the job is already unscheduled and unscheduling it raise an error.
+ToDo:
+- Check if the job is still scheduled before unschedule it.
+--> OK Done not tested as the problem situation is difficult to realize on the target system.
+
+
+- Install configobj: easy_install configobj OK (2012-05-25)
+- Add / Update GPCAlgoConf.spec OK (2012-05-25)
+- Add / Update GPCAlgoConf.ini OK (2012-05-25)
+- Add confIniTest.py 
+
+Update packages / modules (2012-05-25): 
+- ReadWriteDataTest\GPCAlgGlobFSM.py, 
+- ReadWriteDataTest\GPCAlgGlobFSM_sm.py, 
+- ReadWriteDataTest\handleConfig.py
+
+- prepare a __init__.py with py-path setup for all the packages - is OK (2012.04.11) use of python package structure and config.py files
+- dateutil package is now needed (check availability) - is OK (2012.04.10)
+
+Update packages (2012.04.10):
+- AlgSysStatefollowing\SMC\opcVarFSM.py
+- AlgSysStatefollowing\SMC\AlgInternalSysFSM_useOPC.py
+- JobScheduler\JobManagement_GSc.py
+- ReadNeededDataTest\ReadData_useOPC.py
+
+New Package:
+- ReadWriteDataTest\GPCAlgGlobFSM.py
+- ReadWriteDataTest\GPCAlgGlobFSM_sm.py
+- ReadWriteDataTest\TriggerHandling.py
+
+Problems encountered:
+#1 OPC-value data-type problem
+OPC configuration file for OPCMaganer at CRPHT box was modified to see variables in the correct data format and not as text.
+-> This was not done already at Elektro-Schmitt box.
+This was not a problem in all the tests until know as only printing and logging was done. No calculations.
+Reaction:
+- On target box convert the value to int() in two locations
+--> OK test works well with this.
+==> This needs to be removed once the OPCManager correctly converts the data to the datatype.
+ToDo: 
+1) discuss with Ascher to convert the data-types to there correct type ("WORD" or "TEXT")
+2) update the source code by taking it from the development box once done.
+
+#2 In job scheduling (apscheduler) datetime (aware, naive) problem.
+- ReadTrigger() class uses the S0TrigOPC.dtLoc for self.lastT, the local datetime of the OPCtrigger moment.
+  This is a offset.aware type which is needed as OPC by default only handles UTC times but the job scheduler needs to be on local time.
+  -> apscheduler supposes only offset.naive datetimes. This needs to be converted.
+Reaction:
+- On target box is use 
+  start_date=self.RTrig.getNextRT().replace(tzinfo=None),
+  in the job specification.
+--> OK test works well.
+ToDo: 
+- take this to the development system as it is an important bug.
+--> OK Done.
+  
+
+#3 There seems to be a problem with the sleep information after the RTriger job is done. 
+All other process actions (going through pending) also seems to take as sleep of 45s.
+ToDo:
+- Investigate where this comes form.
+
+#4 In the log/printout for "job 1" it is written that sleep is 45 [s] after the MPCDone-Event (back in getRTrig state).
+This is probably not correct ass the job should be sleeping for some 900-x [s] until the next RTrigger event.
+-> This is also reported once the job 1 is awaked. It seems that the log/print is done with t-1 information.
+ToDo:
+- Check and correct this as it leads to misinterpretation.
+    

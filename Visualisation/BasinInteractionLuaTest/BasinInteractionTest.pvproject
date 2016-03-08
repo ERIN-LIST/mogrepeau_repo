@@ -1,0 +1,4 @@
+target=BasinInteractionTest
+xmax=1152
+ymax=648
+script=Lua
