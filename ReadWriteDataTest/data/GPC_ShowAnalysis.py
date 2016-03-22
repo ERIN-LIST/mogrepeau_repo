@@ -1,3 +1,8 @@
+""" ===================
+* Copyright© 2008-2016 LIST (Luxembourg Institute of Science and Technology), all right reserved.
+* Authorship : Georges Schutz, David Fiorelli, 
+* Licensed under GPLV3
+=================== """
 import pandas as pds
 import matplotlib.pyplot as plt
 from collections import defaultdict
@@ -36,7 +41,7 @@ for sti in cols:
         xLabel = [xacIi[0].split('.')[1],]
     xaVi = xa[xacVi].sum(axis=1)
     xVLabel = "%s_Vol" % (sti,)
-    
+
     if isinstance(xai,pds.Series): plt.figure();
     ah = xai.plot(label=xLabel)
     (df[dfci]/100.).plot(ax=ah,label=dfci)

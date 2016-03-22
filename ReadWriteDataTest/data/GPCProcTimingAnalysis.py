@@ -1,3 +1,8 @@
+""" ===================
+* Copyright© 2008-2016 LIST (Luxembourg Institute of Science and Technology), all right reserved.
+* Authorship : Georges Schutz, David Fiorelli, 
+* Licensed under GPLV3
+=================== """
 from dateutil.parser import parse
 from datetime import timedelta
 import re
@@ -34,7 +39,7 @@ class cycle(object):
             i = max([int(ki.split(":")[1]) for ki in self.evtDict.iterkeys() if ki.startswith(evt)])
             evt = "%s:%s" % (evt,i+1)
         self.evtList.append(subEvent(evt, dt, self.refDT))
-            
+
         self.evtDict[evt] = len(self.evtList)-1
     def printDeltas(self):
         s = "TOK-%s: " % self.refDT
@@ -51,7 +56,7 @@ class cycle(object):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Process gpc-logFile for timing analysis.')
-    parser.add_argument('logfile', nargs='?', type=str, default="GPC.log", 
+    parser.add_argument('logfile', nargs='?', type=str, default="GPC.log",
                         help='the log filename')
     args = parser.parse_args()
 
@@ -72,7 +77,7 @@ if __name__ == '__main__':
                 print "Unhandled Event:\n  -> %s" % (l.strip(),)
 
     fh.close()
-    
+
     # for ci in C:
         # print "tOK (%s), Nbr-subEvents=%s" % (ci.refDT, len(ci.evtList))
 
@@ -83,10 +88,10 @@ if __name__ == '__main__':
     OW0 = np.array([ci.evtList[ci.evtDict["#OPCWrite:0"]].delta.total_seconds() for ci in C])
     OW1 = np.array([ci.evtList[ci.evtDict["#OPCWrite:1"]].delta.total_seconds() for ci in C])
     d = np.array([TOKGitter, VOK, MPCA-VOK, MPCD-MPCA, OW0-MPCD, OW1-OW0]).T
-    
+
     for i in xrange(6):
         print "%s: min=%s; max=%s" % (i,d[:,i].min(), d[:,i].max())
-    
+
     bh = pylab.boxplot(d)
     pylab.xticks([1,2,3,4,5,6],['TRef->TOK','TOK->VOK','VOK->MPCA','MPCA->MPCD','MPCD->OW1','OW1->OW2'])
     pylab.xlabel("Different GPC process steps")

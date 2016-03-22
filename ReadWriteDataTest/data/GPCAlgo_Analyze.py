@@ -1,3 +1,8 @@
+""" ===================
+* Copyright© 2008-2016 LIST (Luxembourg Institute of Science and Technology), all right reserved.
+* Authorship : Georges Schutz, David Fiorelli, 
+* Licensed under GPLV3
+=================== """
 import pandas
 from dateutil.parser import parse
 import matplotlib.pyplot as plt
@@ -8,8 +13,8 @@ for l in fh:
     d,v = l.strip().split(': ')
     for vi in v.split(';'):
         exec(vi.strip())
-    df2 = pandas.DataFrame(data = [[IN,OUT,VOL,INComm]], 
-                           columns=['In','Out','Vol','InComm'], 
+    df2 = pandas.DataFrame(data = [[IN,OUT,VOL,INComm]],
+                           columns=['In','Out','Vol','InComm'],
                            index=[parse(d[4:-1]).replace(tzinfo=None)])
     if df.shape == (0,0):
         df = df2

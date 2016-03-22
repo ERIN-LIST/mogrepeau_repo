@@ -1,8 +1,11 @@
-'''
+""" ===================
+* Copyright© 2008-2016 LIST (Luxembourg Institute of Science and Technology), all right reserved.
+* Authorship : Georges Schutz, David Fiorelli, 
+* Licensed under GPLV3
+=================== """
+"""
 Created on 25 of august 2011
-
-@author: schutz
-'''
+"""
 
 from apscheduler.scheduler import Scheduler
 from datetime import datetime, timedelta
@@ -78,7 +81,7 @@ class AlgData_OPC(object):
                 try: #only if variable mapping available store it
                     self.opcVMap = opcVMap
                     self.gpcVars = [opcVMap[vi] for vi in opcVars]
-                except: 
+                except:
                     self.gpcVars = self.opcVars
             else:
                 raise ValueError('Not all needed Variables are listed by the OPC Server\n missing: %s' % (opcVars - opcServVars,))
@@ -102,14 +105,14 @@ class AlgData_OPC(object):
             except OpenOPC.OPCError as e:
                 raise ValueError('OpenOPC.OPCError: %s\n Error during OPC client instantiation' % e)
         try:
-            self.opc.info() #This raises an exception if the OPC-Server is not connected. 
+            self.opc.info() #This raises an exception if the OPC-Server is not connected.
             conn = True
         except:
             conn = False
         if not conn:
             self.opc.connect(self.opcServer)
             sleep(0.3) #To be sure connection is done on OPC server side.
-        
+
     def _close_OPC(self):
         if self.OPCCloseNeeded:
             self.opc.close()
@@ -135,7 +138,7 @@ class AlgData_OPC(object):
             else:
                 self.logger.debug("OpenOPC.OPCError: %s\n -> give up" % e)
                 return ("VarsError","OpenOPC.OPCError  -> give up (see log)")
-            
+
             try:
                 if opcVars == None:
                     opcVars = list(self.opcVars)
@@ -166,7 +169,7 @@ class AlgData_OPC(object):
                 key = self.opcVMap[oi[0]]
             except AttributeError:
                 key = oi[0]
-            if key in self.opcVarsDict: 
+            if key in self.opcVarsDict:
                 self.opcVarsDict[key].setValue(*oi)
             else:
                 self.opcVarsDict[key] = opcVar(*oi)
@@ -178,7 +181,7 @@ class AlgData_OPC(object):
            not isinstance(tagValuePairs[0], (list, tuple)):
             tagValuePairs = [tagValuePairs,]
         elif tagValuePairs == None:
-            tagValuePairs = [] #Change to empty list, important for the for loop 
+            tagValuePairs = [] #Change to empty list, important for the for loop
 
         opcVars = []
         for pi in tagValuePairs:
@@ -200,13 +203,13 @@ class AlgData_OPC(object):
             return self._writeToOPC(opcVars)
         else:
             return True
-    
+
     def getWritableVars(self,gpcVars=None):
         if gpcVars == None:
             gpcVars = list(self.gpcVars)
         wVars = [self.opcVarsDict[vi] for vi in gpcVars if self.opcVarsDict.get(vi,None) and self.opcVarsDict[vi].isWReady()]
         return wVars
-            
+
     def _writeToOPC(self,gpcVars):
         WStatus = None
         if gpcVars == None or len(gpcVars) == 0:
@@ -272,8 +275,8 @@ if __name__ == '__main__':
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
 
     #== Setup logger for the apscheduler module
-    schedlogRF = logging.handlers.RotatingFileHandler( 
-                    filename='apscheduler.log', mode='a', 
+    schedlogRF = logging.handlers.RotatingFileHandler(
+                    filename='apscheduler.log', mode='a',
                     backupCount=5, maxBytes=100000 )
     schedlogRF.setLevel(logging.DEBUG)
     schedlogRF.setFormatter(formatter)
@@ -281,10 +284,10 @@ if __name__ == '__main__':
     ch.setLevel(logging.DEBUG)
     logging.getLogger("apscheduler").addHandler(ch)
     logging.getLogger("apscheduler").addHandler(schedlogRF)
-    
-    #== Setup logger for the opcVarFSM module 
-    opcVarlogRF = logging.handlers.RotatingFileHandler( 
-                    filename='opcVarFSM.log', mode='a', 
+
+    #== Setup logger for the opcVarFSM module
+    opcVarlogRF = logging.handlers.RotatingFileHandler(
+                    filename='opcVarFSM.log', mode='a',
                     backupCount=5, maxBytes=100000 )
     opcVarlogRF.setLevel(logging.DEBUG)
     opcVarlogRF.setFormatter(formatter)
@@ -292,17 +295,17 @@ if __name__ == '__main__':
     opcLogger.setLevel(logging.INFO)
     opcLogger.addHandler(ch)
     opcLogger.addHandler(opcVarlogRF)
-    
-    #== Setup logger for the opcVarFSM module 
-    opcVarDataRF = logging.handlers.RotatingFileHandler( 
-                    filename='opcVars.dat', mode='a', 
+
+    #== Setup logger for the opcVarFSM module
+    opcVarDataRF = logging.handlers.RotatingFileHandler(
+                    filename='opcVars.dat', mode='a',
                     backupCount=20, maxBytes=5000000 )
     opcVarDataRF.setLevel(logging.DEBUG)
     opcLogger = logging.getLogger("opcVarsData")
     opcLogger.setLevel(logging.INFO)
     opcLogger.addHandler(opcVarDataRF)
-    
-    # Instantiate the finite state machine for system state following 
+
+    # Instantiate the finite state machine for system state following
     sm = AlgData_OPC(opcclient_name="GPC_Read.OPCClient",
                      # opcserver='OPCManager.DA.XML-DA.Server.DA', ## Only for local (CRP simulation tests)
                      )
@@ -311,7 +314,7 @@ if __name__ == '__main__':
     sched = Scheduler()
     d = datetime.now() + timedelta( seconds = 1 )
     BZx = sched.add_interval_job( sm.process,
-                                  start_date=d, 
+                                  start_date=d,
                                   seconds=10*60,
                                   #max_runs=10,
                                   #args=[aFSM.fsm,]

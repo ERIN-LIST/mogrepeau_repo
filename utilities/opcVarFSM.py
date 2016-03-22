@@ -1,4 +1,9 @@
 # State Machine example Program
+""" ===================
+* Copyright© 2008-2016 LIST (Luxembourg Institute of Science and Technology), all right reserved.
+* Authorship : Georges Schutz, David Fiorelli, 
+* Licensed under GPLV3
+=================== """
 
 from statedefn import StateTable, event_handler, on_enter_function, on_leave_function
 import logging
@@ -74,15 +79,15 @@ class opcVarFSM(object):
         logger.warning( "%s: State %s, event Reset" % (self.mname,self.QualityState.name(),) )
         self.__init__(self.mname)
 
-    
-    # Associate the handlers with a state. 
-    # First arg is the name of the state.  
+
+    # Associate the handlers with a state.
+    # First arg is the name of the state.
     # Second argument is a list of methods.  One method for each event_handler decorated function.
     #  Order of methodsin the list correspond to order in which the Event Handlers were declared.
-    # Third argument is to be come a list of the next states. 
+    # Third argument is to be come a list of the next states.
     # The first state created becomes the initial state.
-    _UptoDate = qstate.state( "UptoDate",  
-                              (_event_RG_UptoDate, _event_RB_UptoDate, _event_Reset), 
+    _UptoDate = qstate.state( "UptoDate",
+                              (_event_RG_UptoDate, _event_RB_UptoDate, _event_Reset),
                               (None, "FromCach", None) )
     _FromCach = qstate.state( "FromCach",
                               (_event_RG_FromCach, _event_RB_FromCach, _event_Reset),
@@ -176,14 +181,14 @@ class opcVarWFSM(object):
         logger.info( "%s: State %s, event Reset" % (self.mname,self.WriteState.name(),) )
         self.__init__(self.mname)
 
-    # Associate the handlers with a state. 
-    # - First arg is the name of the state.  
+    # Associate the handlers with a state.
+    # - First arg is the name of the state.
     # - Second argument is a list of methods.  One method for each event_handler decorated function.
     #   Order of methods in the list correspond to order in which the Event Handlers were declared.
-    # - Third argument is a list of the next states in the same order as for the methods. 
+    # - Third argument is a list of the next states in the same order as for the methods.
     # The first state created becomes the initial state.
     _Idle = wstate.state( "Idle",
-                          (_event_NData_Idle, _event_WTrig, _event_WOK, _event_WError, _event_Reset), 
+                          (_event_NData_Idle, _event_WTrig, _event_WOK, _event_WError, _event_Reset),
                           ("ToWrite", None, None, None, None) )
     _ToWrite = wstate.state( "ToWrite",
                              (_event_NData_ToWrite, _event_WTrig_ToWrite, _event_WOK, _event_WError, _event_Reset),
@@ -229,7 +234,7 @@ def main_read():
 
 def main_write():
     vTest = opcVarWFSM("Test")
-    
+
     vTest.event_NData(1)
     vTest.event_WTrig()
     vTest.event_WOK()

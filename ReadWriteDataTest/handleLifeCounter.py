@@ -1,8 +1,11 @@
-'''
+""" ===================
+* Copyright© 2008-2016 LIST (Luxembourg Institute of Science and Technology), all right reserved.
+* Authorship : Georges Schutz, David Fiorelli, 
+* Licensed under GPLV3
+=================== """
+"""
 Created on 27 sept. 2012
-
-@author: schutz
-'''
+"""
 import logging
 from time import sleep, time
 from collections import deque
@@ -22,12 +25,12 @@ logging.getLogger("handleLifeCounter").addHandler(h)
 class MPCzLifeJob(jobNormal):
     '''
     This class builds the job that handles the MPC life counter.
-    This counter needs to be updated on OPC-Server level at regular bases 
+    This counter needs to be updated on OPC-Server level at regular bases
     '''
     zLifeVN = "S99.S99_zLife"
     Variables = {'OPC_Group':'GPCLifeVariables' }
     for sti in ['S99',]:
-        Variables[sti] = filter(lambda x: x['GPC'].endswith("zLife"), GPC_StateVars[sti])    
+        Variables[sti] = filter(lambda x: x['GPC'].endswith("zLife"), GPC_StateVars[sti])
     _lenTSs = 5
 
     def __init__(self,jobId,cxt):
@@ -45,7 +48,7 @@ class MPCzLifeJob(jobNormal):
                                    opcclient_name = opcclientName,
                                    opcserver = opcserver)
         self.LifeOPC.logger = self.logger
-        # Also Initialize the next runtime time steps 
+        # Also Initialize the next runtime time steps
         ct = time()
         LCT = self._get_LifeCycle()
         self._nextTSs.clear()
@@ -55,7 +58,7 @@ class MPCzLifeJob(jobNormal):
         try:
             LConf = self.cxt.config["Tree"]["GPCLife"]
             sr = self.cxt.S0_tUpdate*LConf['pctGPCSamp']/100
-            sleepD = max(sr,LConf['minSampling']) 
+            sleepD = max(sr,LConf['minSampling'])
         except AttributeError:
             sleepD = 10
         return sleepD
@@ -67,7 +70,7 @@ class MPCzLifeJob(jobNormal):
             # Probably not life yet
             self.sleep = self._get_LifeCycle()
     def Error(self,fsm):
-        self.logger.error( "%s: in Error", self.logHeader()) 
+        self.logger.error( "%s: in Error", self.logHeader())
     def doPrep(self,fsm):
         self.logger.debug( "%s runs in State %s" % (self.logHeader(), fsm.current_state) )
         if self.isGPCLife():
@@ -85,7 +88,7 @@ class MPCzLifeJob(jobNormal):
         try:
             WStatus = LData.writeOPC(LVars.items(), toOPC=True)
             if len(WStatus) != len(LVars):
-                self.logger.warning( "%s OPC Status size different from VarList size (%s, %s)" % (self.logHeader(), len(WStatus), len(LVars)) )            
+                self.logger.warning( "%s OPC Status size different from VarList size (%s, %s)" % (self.logHeader(), len(WStatus), len(LVars)) )
             tfSuccess = [ri[1] == "Success" if (isinstance(ri,tuple) and len(ri) >= 2) \
                          else False for ri in WStatus]
             if not all(tfSuccess):
@@ -96,7 +99,7 @@ class MPCzLifeJob(jobNormal):
                                   (self.logHeader(), dt, LVars.items()) )
         except StandardError as e:
             self.logger.error("StandardError: %s",e)
-        self.runCnt +=1 
+        self.runCnt +=1
     def doCheckPending(self,fsm):
         self.logger.info( "%s runs in State %s" % (self.logHeader(), fsm.current_state) )
         self._setNextTS()
@@ -187,7 +190,7 @@ class Context():
                     [False,"GPCMap.CheckSysStates"],
                     [False,"GPCMap.GPCisOffline"],]
         idx = randint(0,len(possible)-1)
-        
+
         return dict(zip(['Trans','State'],possible[idx]))
 class GPC_jobManagement(jobManagement):
     def __init__(self,cxt):
@@ -195,7 +198,7 @@ class GPC_jobManagement(jobManagement):
         self.cxt = cxt
     def getPending(self,fsm):
         pass
-    
+
 if __name__ == '__main__':
     ch = logging.StreamHandler()
     ch.setLevel(logging.INFO)
@@ -209,4 +212,4 @@ if __name__ == '__main__':
         jM.fsm.process(None)
         if jM.fsm.current_state == 'Idle':
             sleep(0.5)
-    
+

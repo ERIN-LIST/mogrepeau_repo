@@ -1,3 +1,8 @@
+""" ===================
+* Copyright© 2008-2016 LIST (Luxembourg Institute of Science and Technology), all right reserved.
+* Authorship : Georges Schutz, David Fiorelli, 
+* Licensed under GPLV3
+=================== """
 
 from apscheduler.scheduler import Scheduler
 from time import sleep
@@ -10,16 +15,16 @@ import OpenOPC
 
 
 opcserver = 'OPCManager.DA.XML-DA.Server.DA'
-RTags = [ "VictoryClient.S0_zLife", 
-#          "VictoryClient.S0_tUpdate", 
+RTags = [ "VictoryClient.S0_zLife",
+#          "VictoryClient.S0_tUpdate",
 #          "VictoryClient.S0_tUpdateTrig",
-#          "VictoryClient.S4_Autonom_VSollOben", 
+#          "VictoryClient.S4_Autonom_VSollOben",
 #          "VictoryClient.S4_Autonom_VHystereseOben",
-          "VictoryClient.S4_zLife", 
+          "VictoryClient.S4_zLife",
 #          "VictoryClient.S4_Life",
            ]
-WTags = [ "VictoryClient.S4_QSoll", 
-          "VictoryClient.S99_tUpdateTrig" ] 
+WTags = [ "VictoryClient.S4_QSoll",
+          "VictoryClient.S99_tUpdateTrig" ]
 LCTag = [ "VictoryClient.S99_zLife", ]
 
 #opcserver = 'Graybox.Simulator.1'
@@ -45,7 +50,7 @@ def jobReadOPC(Tags,opcserver='OPCManager.DA.XML-DA.Server.DA',client_name=None)
     opc.close()
     return opcIn
 
-def jobWriteOPC(TVpairs,opcserver='OPCManager.DA.XML-DA.Server.DA',client_name=None):    
+def jobWriteOPC(TVpairs,opcserver='OPCManager.DA.XML-DA.Server.DA',client_name=None):
     opc = OpenOPC.client(client_name=client_name)
     opc.connect(opcserver)
     sleep(0.7)
@@ -104,15 +109,15 @@ if __name__ == '__main__':
 
     sched = Scheduler()
     sched.start()
-    
+
     LifeCJ=True
     AlgoRJ=True
     AlgoWJ=True
-    
+
     if LifeCJ:
         LifeC = {'job':None, 'schedParam': {'name':"LifeCounter-Job",'seconds':15},
                 }
-        LifeC['job'] = sched.add_interval_job( jobLifeC, 
+        LifeC['job'] = sched.add_interval_job( jobLifeC,
                                                start_date = datetime.now() + timedelta(seconds=1),
                                                **LifeC['schedParam'] )
     if AlgoRJ:
@@ -135,4 +140,4 @@ if __name__ == '__main__':
         sleep(10)
         i += 1
     sched.shutdown()
-    
+

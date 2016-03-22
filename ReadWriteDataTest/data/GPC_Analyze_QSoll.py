@@ -1,3 +1,8 @@
+""" ===================
+* Copyright© 2008-2016 LIST (Luxembourg Institute of Science and Technology), all right reserved.
+* Authorship : Georges Schutz, David Fiorelli, 
+* Licensed under GPLV3
+=================== """
 from glob import glob
 import re
 import numpy as np
@@ -66,7 +71,7 @@ def prepLogContent(fl=['GPC.log.2','GPC.log.1','GPC.log']):
                     r = re.match("(?P<Start>.*\[)(?P<data>.*)(?P<End>\])",tmp)
                     tmp = r.group('data').split()
                     lines.append(['SP',[float(ti) for ti in tmp]])
-                        
+
     return lines
 
 fl = [fni for fni in glob("GPCLog_2013*.log") if not fileDataInTarget(fni, pds.datetools.parse('2013-08-29 11:45'))]

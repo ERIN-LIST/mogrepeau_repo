@@ -1,3 +1,8 @@
+""" ===================
+* Copyright© 2008-2016 LIST (Luxembourg Institute of Science and Technology), all right reserved.
+* Authorship : Georges Schutz, David Fiorelli, 
+* Licensed under GPLV3
+=================== """
 
 from JobScheduler.JobManagement_GSc import jobNormal
 from os import path
@@ -9,7 +14,7 @@ from validate import Validator, is_string_list
 
 def is_string_set(value, min=None, max=None):
     """
-    Function to be used as validation function for configobj to produce a set out of a list.  
+    Function to be used as validation function for configobj to produce a set out of a list.
     """
     return set(is_string_list(value,min,max))
 
@@ -54,7 +59,7 @@ class readConfigJob(jobNormal):
         self.logger = logging.getLogger("handleConfig.readConfigJob")
 
     def Error(self,fsm):
-        self.logger.error( "%s: in Error", self.logHeader()) 
+        self.logger.error( "%s: in Error", self.logHeader())
     def doPrep(self,fsm):
         self.logger.debug( "%s runs in State %s" % (self.logHeader(), fsm.current_state) )
         self.checkConfig()

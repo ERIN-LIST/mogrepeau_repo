@@ -1,8 +1,11 @@
-'''
+""" ===================
+* Copyright© 2008-2016 LIST (Luxembourg Institute of Science and Technology), all right reserved.
+* Authorship : Georges Schutz, David Fiorelli, 
+* Licensed under GPLV3
+=================== """
+"""
 Created on 7 aug. 2015
-
-@author: schutz
-'''
+"""
 
 import logging
 from time import sleep, time
@@ -131,7 +134,7 @@ class EPAContainer(object):
             self.actdemand[i].append(d)
             ret,q=et.ENgetnodevalue(i+1, et.EN_QUALITY)
             self.sourcetracing[i].append(q)
-            
+
         for i in range(0,len(self.links)):
             ret,f=et.ENgetlinkvalue(i+1, et.EN_FLOW)
             self.flow[i].append(f)
@@ -170,7 +173,7 @@ class EPAContainer(object):
 class EPASimuJob(jobNormal):
     '''
     This class builds the job that runns the Epanet based virtual reality.
-    1. it reads on one side from a consuption scenario and on the 
+    1. it reads on one side from a consuption scenario and on the
 	   other hand from OPC the current control actions.
 	2. it simulates, using epanet, the network behaviour (levels and flows)
 	3. writes the resulting values to OPC.
@@ -184,7 +187,7 @@ class EPASimuJob(jobNormal):
     OutVars = {'OPC_Group':'EPAOutVariables' }
     for sti in EPA_Vars:
         OutVars[sti] = filter(lambda x: x['OPC'] != "" and \
-                                        x.has_key('Access') and x['Access'] == "rw", EPA_Vars[sti])    
+                                        x.has_key('Access') and x['Access'] == "rw", EPA_Vars[sti])
     _lenTSs = 5
 
     bitVarMap = {"SourcePipe":{"Vars": ["S01.S01_C01_Flow","S03.S03_C01_Flow"], "Range":10,"bit":11},
@@ -200,7 +203,7 @@ class EPASimuJob(jobNormal):
                  "City1":{"Vars": ["S03.S03_C02_Flow",], "Range":6,"bit":4},
                  "City2":{"Vars": ["S03.S03_C02_Flow",], "Range":10,"bit":5},
                  }
-    
+
     def __init__(self,jobId,cxt):
         jobNormal.__init__(self,jobId)
         self.cxt = cxt
@@ -211,7 +214,7 @@ class EPASimuJob(jobNormal):
         self.EPA_zLife = 0
         self.logger = logging.getLogger("runepanettask.epasimujob")
         self.logger.debug( "\n%s EPA Task starts at %s" % (self.logHeader(), datetime.now()) )
-        
+
     def _init_OPC(self, opcclientName='OPCClient.Epanet'):
         opcserver = self.cxt.config["Tree"]["Global"]["OPCServer"]
         self.SysOPC = AlgData_OPC(variables = self.SysVars,
@@ -247,7 +250,7 @@ class EPASimuJob(jobNormal):
         self._nextTSs.clear()
         for i in xrange(self._lenTSs):
             self._nextTSs.append(ct+(i+1)*LCT)
-    
+
     def _ENerr(self,e):
         if(e>0):
             print e, et.ENgeterror(e,25)
@@ -293,7 +296,7 @@ class EPASimuJob(jobNormal):
             # Probably not life yet
             self.sleep = self._get_LifeCycle()
     def Error(self,fsm):
-        self.logger.error( "%s: in Error", self.logHeader()) 
+        self.logger.error( "%s: in Error", self.logHeader())
     def doPrep(self,fsm):
         self.logger.debug( "%s runs in State %s" % (self.logHeader(), fsm.current_state) )
         if self.isEPALife():
@@ -344,7 +347,7 @@ class EPASimuJob(jobNormal):
 
         #Write results to OPC
         self.writeOPC()
-        self.runCnt +=1 
+        self.runCnt +=1
     def doCheckPending(self,fsm):
         self._check_Scenario()
         if self.needNewScenarioData:
@@ -419,7 +422,7 @@ class EPASimuJob(jobNormal):
             opcVars = SData.getWritableVars()
             WStatus = SData.writeOPC(allStored=True, toOPC=True)
             if len(WStatus) != len(opcVars):
-                self.logger.warning( "%s OPC Status size different from VarList size (%s, %s)" % (self.logHeader(), len(WStatus), len(opcVars)) )            
+                self.logger.warning( "%s OPC Status size different from VarList size (%s, %s)" % (self.logHeader(), len(WStatus), len(opcVars)) )
             tfSuccess = [ri[1] == "Success" if (isinstance(ri,tuple) and len(ri) >= 2) \
                          else False for ri in WStatus]
             if not all(tfSuccess):
@@ -442,7 +445,7 @@ class EPASimuJob(jobNormal):
 from random import randint, choice
 from utilities.opcVarHandling import opcVar
 from ReadWriteDataTest.handleConfig import readConfigJob, readGPCConfig
-if __name__ == '__main__': 
+if __name__ == '__main__':
     import ReadWriteDataTest.config as GPCConfig
 
 
@@ -506,12 +509,12 @@ class GPC_jobManagement(jobManagement):
         self.cxt = cxt
     def getPending(self,fsm):
         pass
-    
+
 if __name__ == '__main__':
     ch = logging.StreamHandler()
     ch.setLevel(logging.DEBUG)
-    EPAlogRF = logging.handlers.RotatingFileHandler( 
-                    filename='EPA.log', mode='a', 
+    EPAlogRF = logging.handlers.RotatingFileHandler(
+                    filename='EPA.log', mode='a',
                     backupCount=10, maxBytes=1000000 )
     EPAlogRF.setLevel(logging.DEBUG)
     logging.getLogger("runepanettask").addHandler(ch)
@@ -526,4 +529,4 @@ if __name__ == '__main__':
         jM.fsm.process(None)
         if jM.fsm.current_state == 'Idle':
             sleep(0.05)
-    
+

@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
+""" ===================
+* Copyright© 2008-2016 LIST (Luxembourg Institute of Science and Technology), all right reserved.
+* Authorship : Georges Schutz, David Fiorelli, 
+* Licensed under GPLV3
+=================== """
 """
 Created on Tue Jun 25 10:33:28 2013
-
-@author: fiorelli
 """
 
 import pickle
@@ -11,20 +14,20 @@ import sys
 import numpy as np
 
 
-ControlMethod = 'GPC'    
-ControlMethod = '2LvlsOnOff' 
-    
-ResultFile = 'Pattern_high_flow'    
+ControlMethod = 'GPC'
+ControlMethod = '2LvlsOnOff'
+
+ResultFile = 'Pattern_high_flow'
 #ResultFile = 'LLC_20d'
 #ResultFile = 'LHC_20d'
 #ResultFile = 'GHC_20d'
 #ResultFile = 'LISTshowroom_Scenario_All'
 
-(VOL, IN, OUT, INsim, SP, ZArea, DTZ, DC, DTC, ResDayVol, Date_x, unitConv ) = pickle.load( open( "Results_" + ControlMethod + "_" + ResultFile + ".p", "rb" ) ) 
- 
-#[m3], [m3/cp]  
+(VOL, IN, OUT, INsim, SP, ZArea, DTZ, DC, DTC, ResDayVol, Date_x, unitConv ) = pickle.load( open( "Results_" + ControlMethod + "_" + ResultFile + ".p", "rb" ) )
 
-Datestr_x = [val.strftime("%d-%m-%Y %H:%M:%S") for val in Date_x] 
+#[m3], [m3/cp]
+
+Datestr_x = [val.strftime("%d-%m-%Y %H:%M:%S") for val in Date_x]
 DC=np.array(DC)
 DTC=np.array(DTC)
 DTC = DTC.reshape(len(DTC),1)
@@ -58,14 +61,14 @@ f.writerow(Header)
 for kk in range(ToXL.shape[0]):
 #    f.writerow([ToXL[kk]])
 #    f.writerow([SP[kk], VOL[kk], OUT[kk], ZArea[kk], IN[kk], INsim[kk], DC[kk], DTC[kk]])
-    f.writerow([Datestr_x[kk], 
+    f.writerow([Datestr_x[kk],
                 SP[kk][0],SP[kk][1],SP[kk][2],
                 VOL[kk][0],VOL[kk][1],VOL[kk][2],
-                OUT[kk][0],OUT[kk][1],OUT[kk][2], 
-                ZArea[kk][0],ZArea[kk][1],ZArea[kk][2],  
-                IN[kk][0],IN[kk][1],IN[kk][2], 
-                INsim[kk][0],INsim[kk][1],INsim[kk][2], 
-                DC[kk][0],DC[kk][1],DC[kk][2], 
+                OUT[kk][0],OUT[kk][1],OUT[kk][2],
+                ZArea[kk][0],ZArea[kk][1],ZArea[kk][2],
+                IN[kk][0],IN[kk][1],IN[kk][2],
+                INsim[kk][0],INsim[kk][1],INsim[kk][2],
+                DC[kk][0],DC[kk][1],DC[kk][2],
                 DTC[kk][0]])
 
 

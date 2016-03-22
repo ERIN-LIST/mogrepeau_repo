@@ -1,3 +1,8 @@
+""" ===================
+* Copyright© 2008-2016 LIST (Luxembourg Institute of Science and Technology), all right reserved.
+* Authorship : Georges Schutz, David Fiorelli, 
+* Licensed under GPLV3
+=================== """
 import pandas as pds
 import pylab
 from glob import glob, re, os
@@ -6,7 +11,7 @@ from getopt import getopt, GetoptError
 import pytz
 
 def fileDatetime(fn):
-    fnDT = pds.datetime.strptime(re.match("GPCLog_([T\d]+)(_noTrigOK){0,1}\.log", 
+    fnDT = pds.datetime.strptime(re.match("GPCLog_([T\d]+)(_noTrigOK){0,1}\.log",
                                           fn).groups()[0],
                                  "%Y%m%dT%H%M")
     return fnDT
@@ -30,7 +35,7 @@ def fileDataInTarget(fn, refDate):
         if total_seconds(fnDT + pds.DateOffset(hours=acceptedOffset) - refDate) < -60:
             ret = True
     return ret
-    
+
 def prepFileSysData(fn,preD=[]):
     ret = preD[:]
     started = False
@@ -113,7 +118,7 @@ def fuseData(xa,d):
 def getCLParam(argv):
     param = {'DType':'System'}
     try:
-        opts, args = getopt( argv, "hd:l:t:p:", 
+        opts, args = getopt( argv, "hd:l:t:p:",
                                     ["help", "data=", "ldt=", "dtype=", "fpattern="] )
     except GetoptError:
         usage()

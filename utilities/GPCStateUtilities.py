@@ -1,8 +1,11 @@
-'''
+""" ===================
+* Copyright© 2008-2016 LIST (Luxembourg Institute of Science and Technology), all right reserved.
+* Authorship : Georges Schutz, David Fiorelli, 
+* Licensed under GPLV3
+=================== """
+"""
 Created on 18 avr. 2013
-
-@author: schutz
-'''
+"""
 
 import re
 from collections import defaultdict
@@ -36,9 +39,9 @@ def buildLifeDiff(opcvar,varList=[]):
         else:
             #GPC internal variables are used.
             sti = ki.split('.')[0]
-        if vi.getDiff() == None: 
+        if vi.getDiff() == None:
             diff = None
-        else: 
+        else:
             diff = vi.getDiff().Diff[0]
             if diff < 0: diff += 1<<16
         try:
@@ -46,14 +49,14 @@ def buildLifeDiff(opcvar,varList=[]):
         except TypeError:
             d[sti] = None
     return d
-    
+
 def buildLifeCounter(opcvar,varList=[]):
     d = defaultdict(int)
     if varList == []:
         varList = opcvar.keys()
     for ki in varList:
         vi = opcvar[ki]
-        if ki == vi.name: #GSc: why this if, both paths are identical? 
+        if ki == vi.name: #GSc: why this if, both paths are identical?
             sti = ki.split('.')[0]
         else:
             sti = ki.split('.')[0]
@@ -67,7 +70,7 @@ def buildLifeCounter(opcvar,varList=[]):
 
 def getSysGPCState(stateVars):
     """
-    Returns the system GPC State of each configured station as a dictionary 
+    Returns the system GPC State of each configured station as a dictionary
       station: one of {'offline','maintenance','controlled'}
     - The parameter stateVars need to be a dictionary of opcVars with the system state variables.
     """
@@ -99,7 +102,7 @@ def getSysGPCState(stateVars):
             for i,vi in sTypes:
                 varN = '.'.join((sti,"_".join((sti,vi))))
                 varState = stateVars.get(varN,stiDefaults[vi]) # Default=1 means station is life but has no Autonom variable.
-                if varState != stiDefaults[vi]: 
+                if varState != stiDefaults[vi]:
                     varState = varState.value
                 viState += varState<<i # binary shift operation
         SysGPCState[sti] = gpcStates.get(viState,gpcStates[-1]) # Default=-1 means station is not life.
@@ -107,7 +110,7 @@ def getSysGPCState(stateVars):
 
 def getSysGPCState_StMo(stateVars):
     """
-    Returns the system GPC State of each configured station as a dictionary 
+    Returns the system GPC State of each configured station as a dictionary
       station: one of {'offline','maintenance','controllable','controlled'}
     - The parameter stateVars need to be a dictionary of opcVars with the system state variables.
     """
@@ -135,13 +138,13 @@ def getSysGPCState_StMo(stateVars):
             gpcStates = {-1:'offline',0:'offline',
                          1:'maintenance',2:'maintenance',
                          5:'controllable',
-                         6:'controlled:',7:'controlled:',8:'controlled:'} #Coding definition of SteuerModus 
+                         6:'controlled:',7:'controlled:',8:'controlled:'} #Coding definition of SteuerModus
         viState = None
         if Sys_zLife.get(sti,None):
             vi = sTypes
             varN = '.'.join((sti,"_".join((sti,vi))))
             varState = stateVars.get(varN,stiDefaults[vi]) # Default=1 means station is life but has no SteuerModus/Autonom variable.
-            if varState != stiDefaults[vi]: 
+            if varState != stiDefaults[vi]:
                 varState = varState.value
             viState = varState
             if sTypes == "SteuerModus":
@@ -150,22 +153,22 @@ def getSysGPCState_StMo(stateVars):
 
         stiState = gpcStates.get(viState,gpcStates[-1]) # Default=-1 means station is not life.
         if viState == 6:
-            stiState = stiState + str(varState) # add the SteuerModus value as extension 
+            stiState = stiState + str(varState) # add the SteuerModus value as extension
         SysGPCState[sti] = stiState
     return SysGPCState
 
 def getSysBModeUpdate(stateVars):
     """
-    Return the list of the basins for which the working-mode has changed since last cycle. 
+    Return the list of the basins for which the working-mode has changed since last cycle.
     """
     d = {}
     BModeVars = getBModeVars(stateVars)
     for ki in BModeVars:
         vi = stateVars[ki]
         sti = ki.split('.')[0]
-        if vi.getDiff() == None: 
+        if vi.getDiff() == None:
             diff = None
-        else: 
+        else:
             diff = vi.getDiff().Diff[0]
         d[sti] = {'Update':diff,'Mode':vi.value}
     return d

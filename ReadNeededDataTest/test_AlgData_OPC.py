@@ -1,8 +1,11 @@
-'''
+""" ===================
+* Copyright© 2008-2016 LIST (Luxembourg Institute of Science and Technology), all right reserved.
+* Authorship : Georges Schutz, David Fiorelli, 
+* Licensed under GPLV3
+=================== """
+"""
 Created on 12 oct. 2012
-
-@author: schutz
-'''
+"""
 import unittest
 from ReadData_useOPC import AlgData_OPC
 
@@ -32,27 +35,27 @@ class Test(unittest.TestCase):
         self.ad.readOPC()
         for vi in self.ad.opcVarsDict.itervalues():
             self.assertTrue(vi.usable,"Should be usable")
-    
+
     def test_writeToOPC_direct(self):
         self.ad.readOPC(("VictoryClient.S99_zLife",))
         zLife = self.ad.opcVarsDict["VictoryClient.S99_zLife"]
         self.assertEqual(self.ad.writeOPC((zLife.name,1), toOPC=True),
                          [(zLife.name,"Success"),],
                          "Should return with success")
-        self.assertFalse(zLife.isWReady(), 
+        self.assertFalse(zLife.isWReady(),
                          "After writing to the Variable it should be in 'Idle' state")
         afterWrite = zLife.value
         self.ad.readOPC((zLife.name,))
         afterRead = zLife.value
         self.assertEqual(afterWrite, afterRead,
                          "If write process was successful both should be equal")
-        
+
     def test_writeToOPC_allWritable(self):
         self.ad.readOPC(("VictoryClient.S99_zLife",))
         zLife = self.ad.opcVarsDict["VictoryClient.S99_zLife"]
         self.assertTrue(self.ad.writeOPC((zLife.name,1)),
                         "Should return True as no direct opc write is done")
-        self.assertTrue(zLife.isWReady(), 
+        self.assertTrue(zLife.isWReady(),
                         "After internal value writing the Variable should be in 'ToWrite' state")
         self.assertEqual(self.ad.writeOPC(allStored=True),
                          [(zLife.name,"Success"),],
@@ -62,7 +65,7 @@ class Test(unittest.TestCase):
         afterRead = zLife.value
         self.assertEqual(afterWrite, afterRead,
                          "If write process was successful both should be equal")
-        
+
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

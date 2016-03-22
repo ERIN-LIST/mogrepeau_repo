@@ -1,3 +1,8 @@
+""" ===================
+* Copyright© 2008-2016 LIST (Luxembourg Institute of Science and Technology), all right reserved.
+* Authorship : Georges Schutz, David Fiorelli, 
+* Licensed under GPLV3
+=================== """
 
 from datetime import *
 from dateutil import tz
@@ -41,7 +46,7 @@ class ReadTrigger(object):
         if self.TrigOPC:
             self.TrigOPC.logger = logger
     def isSync(self):
-        if self.DT < 2: 
+        if self.DT < 2:
             return True
         return False
     def isJobAlife(self):
@@ -94,13 +99,13 @@ class ReadTrigger(object):
                 slop = 0
 
             if slop > 0:
-                self.lastT = S0TrigOPC.dtLoc 
+                self.lastT = S0TrigOPC.dtLoc
                 return True
             else:
                 return False
         else:
             return False
-        
+
 
 class WriteTrigger(object):
     TrigSizePct = ReadTrigger.TrigSizePct
@@ -130,7 +135,7 @@ class WriteTrigger(object):
             try:
                 WStatus = self.TrigOPC.writeOPC((S99TrigOPC.name,1), toOPC=True)[0]
                 if WStatus[1] != 'Success':
-                    if self.run > self.maxRuns: 
+                    if self.run > self.maxRuns:
                         self.state = "SetError"
                     self.logger.warning( "%s OPC-Write ends with state %s" % ("GPC WriteTrigger:", WStatus) )
                 else:
@@ -151,7 +156,7 @@ class WriteTrigger(object):
             try:
                 WStatus = self.TrigOPC.writeOPC((S99TrigOPC.name,0), toOPC=True)[0]
                 if WStatus[1] != 'Success':
-                    if self.run > self.maxRuns: 
+                    if self.run > self.maxRuns:
                         self.state = "ResetError"
                     self.logger.warning( "%s OPC-Write ends with state %s" % ("GPC WriteTrigger:", WStatus) )
                 else:

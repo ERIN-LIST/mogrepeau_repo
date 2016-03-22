@@ -1,9 +1,14 @@
+""" ===================
+* Copyright© 2008-2016 LIST (Luxembourg Institute of Science and Technology), all right reserved.
+* Authorship : Georges Schutz, David Fiorelli, 
+* Licensed under GPLV3
+=================== """
 
 from __future__ import with_statement
 import os
 from convertFileName import gpcLogFile
-from zipfile import ZipFile, ZIP_DEFLATED 
- 
+from zipfile import ZipFile, ZIP_DEFLATED
+
 if __name__ == '__main__':
     maxBytes=1000000 # may need adaptation to the used logfile size.
     if os.path.getsize('GPC.log') < maxBytes*9./10:

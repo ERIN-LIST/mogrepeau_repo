@@ -1,8 +1,11 @@
-'''
+""" ===================
+* Copyright© 2008-2016 LIST (Luxembourg Institute of Science and Technology), all right reserved.
+* Authorship : Georges Schutz, David Fiorelli, 
+* Licensed under GPLV3
+=================== """
+"""
 Created on 28 juil. 2011
-
-@author: schutz
-'''
+"""
 
 from apscheduler.scheduler import Scheduler
 from datetime import datetime, timedelta
@@ -10,7 +13,7 @@ from time import sleep
 from JobManagement_GSc import jobManagement
 
 class My_jobManagement(jobManagement):
-    
+
 #    def __init__(self):
 #        jobManagement.__init__(self)
 
@@ -32,7 +35,7 @@ class My_jobManagement(jobManagement):
             else:
                 self.Error()
         fsm.memory['Buffer'].append('End')
-    
+
 
 def jobM():
     print "JobManagement started: %s" % (datetime.now())
@@ -48,7 +51,7 @@ if __name__ == '__main__':
     sched = Scheduler()
     d = datetime.now() + timedelta( seconds = 2 )
     job = sched.add_interval_job(jobM,
-                                 start_date=d, 
+                                 start_date=d,
                                  seconds=15,
                                  max_runs=3,
                                  #args=[sched,'Test IntervalJob']

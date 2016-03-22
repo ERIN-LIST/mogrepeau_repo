@@ -1,5 +1,10 @@
+""" ===================
+* Copyright© 2008-2016 LIST (Luxembourg Institute of Science and Technology), all right reserved.
+* Authorship : Georges Schutz, David Fiorelli, 
+* Licensed under GPLV3
+=================== """
 
-if __name__ == '__main__': 
+if __name__ == '__main__':
     import config
 
 import sys
@@ -95,10 +100,10 @@ class GPCAlgGlobFSM():
         # Initialize the MPC OPC data objects.
         if mem["MPCData"]['State'] == None \
            and self.configJob.isConfigRead():
-            # Basic dynamic System variables needed for MPC as input variables 
+            # Basic dynamic System variables needed for MPC as input variables
             self.MPCData = AlgData_OPC(opcserver = self.config["Tree"]["Global"]["OPCServer"])
             self.MPCData.logger = self.logger
-            # All MPC related output variables 
+            # All MPC related output variables
             Variables = {'OPC_Group':'MPCOutVariables' }
             Variables.update(GPC_OutVars)
             self.MPCOutData = AlgData_OPC(opcserver = self.config["Tree"]["Global"]["OPCServer"],
@@ -114,17 +119,17 @@ class GPCAlgGlobFSM():
             mem["MPCData"]['State'] = 'Done'
 
     def doInitRTrigParam(self):
-        self.RTrig = ReadTrigger( S0_tUpdate=self.S0_tUpdate, 
-                                  opcserver=self.config["Tree"]["Global"]["OPCServer"], 
+        self.RTrig = ReadTrigger( S0_tUpdate=self.S0_tUpdate,
+                                  opcserver=self.config["Tree"]["Global"]["OPCServer"],
                                   test=True)
         self.RTrig.setLogger(self.logger)
         self.RTrig.CTimeperiod = self.config["Tree"]["MPC_Opti"]["ControlTimeperiod"]
 
     def doUpdateRTrigParam(self,dt):
-        """Update trigger detection parameter to get a more precise 
+        """Update trigger detection parameter to get a more precise
            identification of the positive slope instance."""
         self.RTrig.updateTrigParam()
-        self.logger.debug( "Trigger: lastDT=%s,DT=%s" % (self.RTrig.lastDT,self.RTrig.DT) )        
+        self.logger.debug( "Trigger: lastDT=%s,DT=%s" % (self.RTrig.lastDT,self.RTrig.DT) )
 
     def doUpdateConfig(self,conf):
         self.config = dict(zip(("Tree","Valid"),conf))
@@ -137,9 +142,9 @@ class GPCAlgGlobFSM():
         DT = self.RTrig.DT
         NextRT = self.RTrig.getNextRT().replace(tzinfo=None)
         max_runs = self.RTrig.getMaxRuns()
-        #Debug-GSc: test max_runs = 4 
-        self.RTrig.job = self.sched.add_interval_job(self.jobRTrig, 
-                                    seconds = DT, 
+        #Debug-GSc: test max_runs = 4
+        self.RTrig.job = self.sched.add_interval_job(self.jobRTrig,
+                                    seconds = DT,
                                     start_date = NextRT,
                                     max_runs = max_runs,
                                     name = "ReadTrigger-Job")
@@ -161,8 +166,8 @@ class GPCAlgGlobFSM():
         else:
             self.WTrig = WriteTrigger(S0_tUpdate=self.S0_tUpdate)
             self.WTrig.setLogger(self.logger)
-            self.WTrig.job = self.sched.add_interval_job(self.jobWTrig, 
-                                        seconds = self.WTrig.DT, 
+            self.WTrig.job = self.sched.add_interval_job(self.jobWTrig,
+                                        seconds = self.WTrig.DT,
                                         start_date = datetime.now() + timedelta(seconds=0.5),
                                         max_runs = 2,
                                         name = "WriteTrigger-Job")
@@ -171,9 +176,9 @@ class GPCAlgGlobFSM():
             # Should be called a maximum of 2x self.WTrig.maxRuns
             # but only until self.WTrig.state is in ('Reset' or some "Error")
             # "sched" seems not to be best as Setting process can take several runs (DT 1s)
-            # and reseting the same but in between 10%S0_tUpdate needs to be waited.   
+            # and reseting the same but in between 10%S0_tUpdate needs to be waited.
     def doReadOPC(self):
-        #GSc-ToDo: rework this first level checking. Here only completely infeasible situations should lead to "VarsError" 
+        #GSc-ToDo: rework this first level checking. Here only completely infeasible situations should lead to "VarsError"
         #Get first state related information and check it
         evStr = self.MPCStateData.readOPC()
         if evStr == None:
@@ -222,7 +227,7 @@ class GPCAlgGlobFSM():
                                    (self.doWriteOPCMemory["Count"],nbrErr))
                 self.eventHandler({"Type":"OPCWriteError",
                                    "Data":"writeOPC returns: %s" % (opcResult)})
-            else:  
+            else:
                 self.logger.debug( "doWriteOPC (%s): %s un-successful opc-writeouts" % \
                                    (self.doWriteOPCMemory["Count"],nbrErr))
                 sleep(0.5)
@@ -240,7 +245,7 @@ class GPCAlgGlobFSM():
             return
 
         # Check the life states of all configured actors
-        
+
 #        SysGPCState = getSysGPCState(self.MPCStateData.opcVarsDict)# Old Life/Autonom based approach
         SysGPCState = getSysGPCState_StMo(self.MPCStateData.opcVarsDict)
         if getattr(self, "SysGPCState", None):
@@ -312,7 +317,7 @@ class GPCAlgGlobFSM():
                         pass
                 except:
                     pass
-                
+
 
         #ToDo-GSc: integrate the AlgInernalSysFSM (S4, ...)
         # - init it in doInit
@@ -325,7 +330,7 @@ class GPCAlgGlobFSM():
         if all([zi in ['offline','maintenance','controllable'] for si,zi in self.SysGPCState.iteritems() if si not in ['S0','S99']]):
             self.eventDeque.append({"Type":"MPCInactif","Data":"There is NO Station configured for GPC control"})
         else:
-            self.eventDeque.append({"Type":"MPCActive"})            
+            self.eventDeque.append({"Type":"MPCActive"})
 
 
     def doRunMPC(self):
@@ -336,7 +341,7 @@ class GPCAlgGlobFSM():
             algo.run(self.MPCData.opcVarsDict,
                      stateVars=self.MPCStateData.opcVarsDict,
                      outVars=self.MPCOutData.opcVarsDict)
-            self.eventDeque.append({"Type":"MPCDone",})            
+            self.eventDeque.append({"Type":"MPCDone",})
         except BaseException as e:
             interItem = {"Type":"MPCImpossible",
                          "Data":"General MPC-Error: %s" % e}
@@ -352,7 +357,7 @@ class GPCAlgGlobFSM():
         for ki,vi in self.MPCOutData.opcVarsDict.items() + self.MPCStateData.opcVarsDict.items():
             if vi.isWReady():
                 vi._reset()
-        
+
     def doWarning(self,msg):
         pass
 
@@ -368,12 +373,12 @@ Only a 'Reset'-Event or a complete GSP-restart are possible in this System state
             except:
                 DT = 900
             #Debug-GSc: test DT = 40
-            self.sched.add_date_job( self.jobReset, 
+            self.sched.add_date_job( self.jobReset,
                                      date = datetime.now() + timedelta(seconds=DT),
                                      name = "Reset-Job" )
             self.logger.debug("""====!! GPC auto-Reset !!====
-The GPC: will be automatically reset at %s 
-============================""" % (DT,))            
+The GPC: will be automatically reset at %s
+============================""" % (DT,))
 
 
     def isInitDone(self):
@@ -390,14 +395,14 @@ The GPC: will be automatically reset at %s
         elif self.getMPCSimuMode() in [None,'NoOPCWrite']:
             return True
         return False
-        
+
     def isNoOPCWriteTrigger(self):
         if not self.isMPCSimu():
             return False
         elif self.getMPCSimuMode() in [None,'NoOPCWrite','NoOPCWriteTrigger']:
             return True
         return False
-        
+
     def isMPCSimu(self):
         try:
             MPCSimu = self.config['Tree']['MPC']['simu']
@@ -418,7 +423,7 @@ The GPC: will be automatically reset at %s
             return True
         self.logger.debug("isOPCWriteError == False")
         return False
-        
+
     def logIgnored(self):
         self._fsm.getDebugStream().write("The latest asked transition was ignored by the StateMashine.")
 
@@ -431,7 +436,7 @@ The GPC: will be automatically reset at %s
         else:
             if not j.compute_next_run_time(datetime.now()):
                 self.doRTrigMemory['TrigDone'] = True
-                self.doRTrigMemory['Event'] = {"Type":"TrigError", 
+                self.doRTrigMemory['Event'] = {"Type":"TrigError",
                              "Data":"%s: no next fire time scheduled" % j.name}
 
     def jobWTrig(self):
@@ -488,7 +493,7 @@ The GPC: will be automatically reset at %s
             pState = self._fsm.getPreviousState().getName()
             FSMState = "In Transition: %s from %s" %(trans,pState)
             ret = {'Trans':trans,'State':pState,'Msg':FSMState}
-            
+
         return ret
 
     def handleStateSwitch(self,C_Switch):
@@ -517,7 +522,7 @@ The GPC: will be automatically reset at %s
                     self.logger.debug( "Basin StateSwitch: %s; writeOPC: %s" % (C_Switch, opcResult,))
         elif self.isNoOPCWrite() and len(C_Switch) > 0:
             self.logger.debug( "Basin StateSwitch: %s but NoOPCWrite is active" % (C_Switch,) )
-    
+
     def eventHandler(self,evt):
         evtStr = evt["Type"]
         if evt.has_key("Data"):
@@ -554,7 +559,7 @@ The GPC: will be automatically reset at %s
             raise ValueError("Unhandled Event type: %s" % evt)
 
 class GPC_jobManagement(jobManagement):
-    
+
     def __init__(self,cxt):
         jobManagement.__init__(self)
         self.cxt = cxt
@@ -575,7 +580,7 @@ class scenarioJob(jobNormal):
         self.sleep = None
         self.logger = logging.getLogger("GPCAlgGlobProc.scenarioJob")
     def Error(self,fsm):
-        self.logger.error( "%s: in Error", self.logHeader()) 
+        self.logger.error( "%s: in Error", self.logHeader())
     def doPrep(self,fsm):
         self.logger.debug( "%s runs in State %s" % (self.logHeader(), fsm.current_state) )
         self.sceIdx = 0
@@ -584,8 +589,8 @@ class scenarioJob(jobNormal):
         gpcState = self.cxt.getFSMState()['State']
         item = self.scenario[self.sceIdx]
         self.cxt.eventHandler(item)
-        # If FSM change state, current scenario is done. 
-        if self.cxt.getFSMState()['State'] != gpcState: 
+        # If FSM change state, current scenario is done.
+        if self.cxt.getFSMState()['State'] != gpcState:
             self.scenario[self.sceIdx]["Done"] = True
         elif gpcState == "GPCMap.INIT":
             if self.cxt.checkInitSleep():
@@ -605,7 +610,7 @@ class scenarioJob(jobNormal):
         self.sleep = 0.01
         Data = None
         #GSc-ToDo: by inserting new scenarios this list is constantly growing and may lead to an out-of-memory error.
-        # -> add some thing like garbage collection or use a queue with given length where old executed scenario entries are removed.   
+        # -> add some thing like garbage collection or use a queue with given length where old executed scenario entries are removed.
         if gpc.getFSMState()['Trans']:
             nextSce = False
             self.sleep = 0.1
@@ -621,7 +626,7 @@ class scenarioJob(jobNormal):
                     else:
                         self.sleep = 5
                     nextSce = False
-                    
+
         elif gpcState == "GPCMap.GetRTrig":
             RTr = gpc.RTrig
             if gpc.doRTrigMemory["TrigDone"]:
@@ -635,10 +640,10 @@ class scenarioJob(jobNormal):
             else:
                 #If scheduled trigger job stopped due to an error raised in the job go to GPCisOffline
                 msg = "Job %s (ID %s):" % (self.__class__.__name__,self.id)
-                self.scenario.insert(self.sceIdx+1, 
+                self.scenario.insert(self.sceIdx+1,
                                      {"Type":"TrigError",
                                       "Data":msg+" Trigger Job not alive any more.",
-                                      "Done":False})                
+                                      "Done":False})
         elif gpcState == "GPCMap.WriteOPCVars":
             if sce['Type'] != "OPCWrite" or sce['Done'] == True:
                 self.scenario.insert(self.sceIdx+1, {"Type":"OPCWrite","Done":False})
@@ -657,7 +662,7 @@ class scenarioJob(jobNormal):
                 self.sleep = None
             except IndexError:
                 nextSce = False
-            
+
         elif gpcState == "GPCMap.GPCisOffline":
             try:
                 self.sleep = self.cxt.S0_tUpdate / self.cxt.RTrig.TrigSizePct
@@ -708,12 +713,12 @@ if __name__ == "__main__":
     # Setting up the logging handlers.
     ch = logging.StreamHandler()
     ch.setLevel(logging.DEBUG)
-    GPClogRF = logging.handlers.RotatingFileHandler( 
-                    filename='GPC.log', mode='a', 
+    GPClogRF = logging.handlers.RotatingFileHandler(
+                    filename='GPC.log', mode='a',
                     backupCount=10, maxBytes=1000000 )
     GPClogRF.setLevel(logging.DEBUG)
-    GPCAlglogRF = logging.handlers.RotatingFileHandler( 
-                    filename='GPCAlgo.log', mode='a', 
+    GPCAlglogRF = logging.handlers.RotatingFileHandler(
+                    filename='GPCAlgo.log', mode='a',
                     backupCount=10, maxBytes=1000000 )
     GPCAlglogRF.setLevel(logging.DEBUG)
     logging.getLogger("apscheduler").addHandler(ch)
@@ -733,7 +738,7 @@ if __name__ == "__main__":
     logging.getLogger("GPCAlgGlobProc").addHandler(GPClogRF)
     logging.getLogger("GPCAlgGlobProc").setLevel(logging.DEBUG)
 
-    # Initialize and start the GPC System 
+    # Initialize and start the GPC System
     sm = GPCAlgGlobFSM(debugFlag=True,configFile=config.GPCConfFile)
     sm.start()
     test_scenario(sm)

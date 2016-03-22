@@ -1,3 +1,8 @@
+""" ===================
+* Copyright© 2008-2016 LIST (Luxembourg Institute of Science and Technology), all right reserved.
+* Authorship : Georges Schutz, David Fiorelli, 
+* Licensed under GPLV3
+=================== """
 
 from __future__ import with_statement
 import os, re
@@ -19,7 +24,7 @@ def fTail(fname,nbrL=500):
             lines = f.readlines()       # Read to end
     lines = lines[-nbrL:]
     return lines, fstart
-    
+
 def gpcLogFile(fn):
     if os.path.exists(fn):
         e = None
@@ -27,7 +32,7 @@ def gpcLogFile(fn):
         stop = False
         while not e and not stop:
             lines, stop = fTail(fn,nbrL)
-            
+
             # searching for the re
             lines.reverse() #revers the lines as we search from back.
             for l in lines:
@@ -52,7 +57,7 @@ def gpcLogFile(fn):
 def gpcAlgoLogFile(fn):
     if os.path.exists(fn):
         f_dt = dt.datetime.fromtimestamp(os.path.getmtime(fn))
-        os.rename(fn, 
+        os.rename(fn,
                   'GPCAlgoLog_%s.log' % f_dt.strftime("%Y%m%dT%H%M"))
     else:
         print "filename '%s' does not exist" % (fn,)

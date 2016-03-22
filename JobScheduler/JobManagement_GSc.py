@@ -1,3 +1,8 @@
+""" ===================
+* Copyright© 2008-2016 LIST (Luxembourg Institute of Science and Technology), all right reserved.
+* Authorship : Georges Schutz, David Fiorelli, 
+* Licensed under GPLV3
+=================== """
 
 from FSM_NS import ObjFSM
 from time import time
@@ -83,11 +88,11 @@ class jobManagement(object):
     """
     Class organizing the management of different jobs:
     - insert new jobs to be treated
-    - treat the queued jobs until there termination defined by there "END" state.  
+    - treat the queued jobs until there termination defined by there "END" state.
     """
-    
+
     jobDict = {'s':jobSimple, 'n':jobNormal}
-    
+
     def __init__(self):
         #Specify the state machine states and transitions with conditions and actions
         self.fsm = ObjFSM('INIT', memory = {'Queue':[],'Buffer':[],'Sleep':[]})
@@ -182,7 +187,7 @@ class jobManagement(object):
     def _getSleepingToBeAwaken(self,fsm):
         tNow = time()
         return [si for si in fsm.memory['Sleep'] if si['Event'] < tNow]
-        
+
 
 def main():
     jM = jobManagement()

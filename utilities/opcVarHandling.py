@@ -1,8 +1,11 @@
-'''
+""" ===================
+* Copyright© 2008-2016 LIST (Luxembourg Institute of Science and Technology), all right reserved.
+* Authorship : Georges Schutz, David Fiorelli, 
+* Licensed under GPLV3
+=================== """
+"""
 Created on 9 oct. 2012
-
-@author: schutz
-'''
+"""
 
 from dateutil import tz, parser
 from datetime import datetime
@@ -23,9 +26,9 @@ class opcVar(object):
                 self.dt = parser.parse(time).replace(tzinfo=tz.tzutc()) #time is supposed to be in UTC.
             except AttributeError as e:
                 self.dt = None
-                #GScToDo here a logging would be helpfill because the print will probably be lost.  
+                #GScToDo here a logging would be helpfill because the print will probably be lost.
                 print "Not handled time format in opcVarData: %s" %(e,)
-                
+
     class opcVarWriteData():
         def __init__(self, value, dt):
             self.value = value
@@ -67,7 +70,7 @@ class opcVar(object):
         self.fsm.event_Reset()
         if self.isWritable():
             self.fsmW.event_Reset()
-                           
+
     def setValue(self, name, value, quality, time):
         if name != self.name:
             raise NameError("Provided variable name (%s) does not match opcVar.name (%s)" % (name,self.name))
@@ -140,7 +143,7 @@ class opcVar(object):
                 return (self.name, value)
             return None
         except:
-            return 
+            return
 
     @property
     def value(self):
@@ -148,7 +151,7 @@ class opcVar(object):
             if self.fsm.QualityState.name() == "UptoDate":
                 return self.cach[0].value
             elif self.fsm.QualityState.name() == "FromCach":
-                #GScToDo: Implement some basic treatments. 
+                #GScToDo: Implement some basic treatments.
                 return self.cach[0].value
             else:
                 return None
@@ -171,7 +174,7 @@ class opcVar(object):
         try:
             return self.dt.astimezone(tz.tzlocal())
         except IndexError:
-            return None        
+            return None
     @property
     def usable(self):
         if self.fsm.QualityState.name() in ["UptoDate","FromCach"]:
